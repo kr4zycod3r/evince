@@ -444,8 +444,7 @@ page_changed_cb (EvDocumentModel *model,
                  gint             new_page,
                  EvHistory       *history)
 {
-        if (ABS (new_page - old_page) > 1)
-                ev_history_add_link_for_page (history, new_page);
+         ev_history_add_link_for_page (history, new_page);	
 }
 
 static void

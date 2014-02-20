@@ -204,25 +204,30 @@ void
 ev_history_go_back (EvHistory *history)
 {
         EvHistoryPrivate *priv;
-
-        g_return_if_fail (EV_IS_HISTORY (history));
+	GList *l;
+       	
+	g_return_if_fail (EV_IS_HISTORY (history));
 
         if (!ev_history_can_go_back (history))
                 return;
 
         priv = history->priv;
 
-        /* Move current back one step */
-        priv->current = priv->current->prev;
+	l = priv->current->prev;
+	priv->current->prev = NULL;
+	
+	ev_history_activate_current_link (history);
 
-        ev_history_activate_current_link (history);
+        /* Move current back one step */
+        priv->current = l;
+	priv->current->next = NULL;
 }
 
 gboolean
 ev_history_can_go_forward (EvHistory *history)
 {
         EvHistoryPrivate *priv;
-
+       	
         g_return_val_if_fail (EV_IS_HISTORY (history), FALSE);
 
         if (ev_history_is_frozen (history))
@@ -236,7 +241,6 @@ void
 ev_history_go_forward (EvHistory *history)
 {
         EvHistoryPrivate *priv;
-
         g_return_if_fail (EV_IS_HISTORY (history));
 
         if (!ev_history_can_go_forward (history))
@@ -444,7 +448,12 @@ page_changed_cb (EvDocumentModel *model,
                  gint             new_page,
                  EvHistory       *history)
 {
-         ev_history_add_link_for_page (history, new_page);	
+         
+	
+	if(ABS(new_page-old_page)>1)
+		ev_history_add_link_for_page (history, old_page);
+	 
+		
 }
 
 static void

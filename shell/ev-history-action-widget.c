@@ -291,7 +291,6 @@ history_changed_cb (EvHistory             *history,
         gtk_widget_set_sensitive (priv->back_button, ev_history_can_go_back (history));
         gtk_widget_set_sensitive (priv->forward_button, ev_history_can_go_forward (history));
 }
-
 void
 ev_history_action_widget_set_history (EvHistoryActionWidget *history_widget,
                                       EvHistory             *history)

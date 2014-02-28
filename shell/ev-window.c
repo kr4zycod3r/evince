@@ -347,6 +347,8 @@ static void     ev_view_popup_cmd_copy_image            (GtkAction        *actio
 							 EvWindow         *window);
 static void     ev_view_popup_cmd_annot_properties      (GtkAction        *action,
 							 EvWindow         *window);
+static void     ev_view_popup_cmd_annot_remove          (GtkAction        *action,
+		                                         EvWindow         *window);
 static void	ev_attachment_popup_cmd_open_attachment (GtkAction        *action,
 							 EvWindow         *window);
 static void	ev_attachment_popup_cmd_save_attachment_as (GtkAction     *action, 
@@ -564,6 +566,8 @@ ev_window_update_actions_sensitivity (EvWindow *ev_window)
 					has_pages &&
 					ev_view_supports_caret_navigation (view) &&
 					!presentation_mode);
+	
+	ev_window_set_action_sensitive (ev_window, "History",TRUE);
 }
 
 static void
@@ -947,6 +951,7 @@ ev_window_page_changed_cb (EvWindow        *ev_window,
 
 	if (ev_window->priv->metadata && !ev_window_is_empty (ev_window))
 		ev_metadata_set_int (ev_window->priv->metadata, "page", new_page);
+	printf("\nev_window_page_changed_cb-----\n");
 }
 
 static const gchar *
@@ -4850,7 +4855,7 @@ ev_window_document_changed_cb (EvDocumentModel *model,
 }
 
 static void
-ev_window_sizing_mode_changed_cb (EvDocumentModel *model,
+ev_window_sizing_mode_changed_cb (EvDocumentModel *model,           //checked
 				  GParamSpec      *pspec,
 		 		  EvWindow        *ev_window)
 {
@@ -4862,7 +4867,6 @@ ev_window_sizing_mode_changed_cb (EvDocumentModel *model,
 		      GTK_POLICY_AUTOMATIC : GTK_POLICY_NEVER,
 		      "vscrollbar-policy", GTK_POLICY_AUTOMATIC,
 		      NULL);
-
 	update_sizing_buttons (ev_window);
 	save_sizing_mode (ev_window);
 }
@@ -5137,7 +5141,7 @@ ev_window_view_sidebar_cb (GtkAction *action, EvWindow *ev_window)
 }
 
 static void
-ev_window_sidebar_current_page_changed_cb (EvSidebar  *ev_sidebar,
+ev_window_sidebar_current_page_changed_cb (EvSidebar  *ev_sidebar,  //checked
 					   GParamSpec *pspec,
 					   EvWindow   *ev_window)
 {
@@ -5860,7 +5864,7 @@ ev_window_dispose (GObject *object)
 
 	priv->recent_ui_id = 0;
 
-	if (priv->model) {
+	if (priv->model) {   //checked
 		g_signal_handlers_disconnect_by_func (priv->model,
 						      ev_window_page_changed_cb,
 						      window);
@@ -6222,7 +6226,10 @@ static const GtkActionEntry view_popup_entries [] = {
 	{ "CopyImage", NULL, N_("Copy _Image"), NULL,
 	  NULL, G_CALLBACK (ev_view_popup_cmd_copy_image) },
 	{ "AnnotProperties", NULL, N_("Annotation Properties…"), NULL,
-	  NULL, G_CALLBACK (ev_view_popup_cmd_annot_properties) }
+	  NULL, G_CALLBACK (ev_view_popup_cmd_annot_properties) },
+	{ "AnnotRemove", NULL, N_("Remove Annotation"), NULL,
+	  NULL, G_CALLBACK (ev_view_popup_cmd_annot_remove) }
+
 };
 
 static const GtkActionEntry attachment_popup_entries [] = {
@@ -7000,6 +7007,24 @@ ev_view_popup_cmd_annot_properties (GtkAction *action,
 }
 
 static void
+ev_view_popup_cmd_annot_remove (GtkAction *action, EvWindow *window)
+{
+
+	EvAnnotation	      *annot;
+	EvView                *view;
+
+	view = EV_VIEW (EV_VIEW (window->priv->view));
+	annot = window->priv->annot;
+	guint page = ev_annotation_get_page_index (window->priv->annot);
+
+	ev_view_remove_annotation(view,
+			          annot ,
+				  page);
+
+	printf("\nannot removed\n");
+}
+
+static void
 ev_attachment_popup_cmd_open_attachment (GtkAction *action, EvWindow *window)
 {
 	GList     *l;
@@ -7641,7 +7666,7 @@ ev_window_init (EvWindow *ev_window)
 	gtk_container_add (GTK_CONTAINER (ev_window->priv->scrolled_window),
 			   ev_window->priv->view);
 
-	/* Connect to model signals */
+	/* Connect to model signals *///checked
 	g_signal_connect_swapped (ev_window->priv->model,
 				  "page-changed",
 				  G_CALLBACK (ev_window_page_changed_cb),

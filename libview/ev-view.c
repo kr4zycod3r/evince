@@ -3198,6 +3198,25 @@ ev_view_cancel_add_annotation (EvView *view)
 	ev_view_handle_cursor_over_xy (view, x, y);
 }
 
+void
+ev_view_remove_annotation (EvView		 *view,
+		           EvAnnotation          *annot,
+			   guint                  page)
+{
+	GtkWidget *window;
+
+	printf("\nremoving annotation\n");
+	ev_document_doc_mutex_lock ();
+	ev_document_annotations_remove_annotation (EV_DOCUMENT_ANNOTATIONS (view->document),
+			                           annot);
+	window = g_object_get_data (G_OBJECT (annot), "popup");
+	gdk_cursor_unref (gdk_window_get_cursor(window));
+	gtk_widget_destroy (window);
+	ev_document_doc_mutex_unlock ();
+	ev_view_reload_page(view , page , NULL);
+
+}
+
 static gboolean
 ev_view_synctex_backward_search (EvView *view,
 				 gdouble x,
@@ -6723,6 +6742,7 @@ ev_view_page_changed_cb (EvDocumentModel *model,
 	} else {
 		gtk_widget_queue_draw (GTK_WIDGET (view));
 	}
+	printf("\nev-view pagechanged---%d",new_page);
 }
 
 static void
@@ -7223,7 +7243,7 @@ ev_view_set_model (EvView          *view,
 	g_signal_connect (view->model, "notify::fullscreen",
 			  G_CALLBACK (ev_view_fullscreen_changed_cb),
 			  view);
-	g_signal_connect (view->model, "page-changed",
+        g_signal_connect (view->model, "page-changed",
 			  G_CALLBACK (ev_view_page_changed_cb),
 			  view);
 

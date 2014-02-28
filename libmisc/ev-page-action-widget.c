@@ -157,7 +157,7 @@ page_scroll_cb (EvPageActionWidget *action_widget, GdkEventScroll *event)
 	if ((event->direction == GDK_SCROLL_UP) && (pageno > 0))
 		pageno--;
 	ev_document_model_set_page (model, pageno);
-
+        printf("\npageno=%d\n",pageno);
 	return TRUE;
 }
 

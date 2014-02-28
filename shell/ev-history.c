@@ -144,7 +144,7 @@ ev_history_is_frozen (EvHistory *history)
 }
 
 void
-ev_history_add_link (EvHistory *history,
+ev_history_add_link (EvHistory *history,           
                      EvLink    *link)
 {
         EvHistoryPrivate *priv;
@@ -204,8 +204,7 @@ void
 ev_history_go_back (EvHistory *history)
 {
         EvHistoryPrivate *priv;
-	GList *l;
-       	
+	
 	g_return_if_fail (EV_IS_HISTORY (history));
 
         if (!ev_history_can_go_back (history))
@@ -213,14 +212,10 @@ ev_history_go_back (EvHistory *history)
 
         priv = history->priv;
 
-	l = priv->current->prev;
-	priv->current->prev = NULL;
-	
-	ev_history_activate_current_link (history);
-
         /* Move current back one step */
-        priv->current = l;
-	priv->current->next = NULL;
+	priv->current = priv->current->prev;
+
+	ev_history_activate_current_link (history);
 }
 
 gboolean
@@ -440,6 +435,7 @@ ev_history_add_link_for_page (EvHistory *history,
 
         ev_history_add_link (history, link);
         g_object_unref (link);
+	printf("\nev-history-add-link-for-page----%d\n",page);
 }
 
 static void
@@ -449,9 +445,10 @@ page_changed_cb (EvDocumentModel *model,
                  EvHistory       *history)
 {
          
-	
+	        printf("\npage_changed_cb-----old=%d new=%d\n",old_page,new_page); 
 	if(ABS(new_page-old_page)>1)
-		ev_history_add_link_for_page (history, old_page);
+		ev_history_add_link_for_page (history, new_page);
+	
 	 
 		
 }

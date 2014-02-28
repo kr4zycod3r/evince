@@ -72,6 +72,7 @@
     <menuitem name="SaveAttachmentAs" action="SaveAttachmentAs"/>
     <separator/>
     <menuitem name="AnnotProperties" action="AnnotProperties"/>
+    <menuitem name="AnnotRemove" action="AnnotRemove"/>
     <menuitem name="FileOpenContainingFolder" action="FileOpenContainingFolder"/>
   </popup>
 

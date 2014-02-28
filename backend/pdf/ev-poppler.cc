@@ -3208,6 +3208,39 @@ pdf_document_annotations_save_annotation (EvDocumentAnnotations *document_annota
 
 	PDF_DOCUMENT (document_annotations)->annots_modified = TRUE;
 }
+static void
+pdf_document_annotations_remove_annotation (EvDocumentAnnotations *document_annotations,
+                                            EvAnnotation          *annot)
+{
+	PopplerPage  *poppler_page;
+	PdfDocument  *pdf_document;
+	EvPage       *page;
+	PopplerAnnot *poppler_annot;
+	
+	printf("REMOVE ANNOT 1\n");
+	poppler_annot = POPPLER_ANNOT (g_object_get_data (G_OBJECT (annot), "poppler-annot"));
+	
+	if(!poppler_annot)
+		return;
+
+        pdf_document = PDF_DOCUMENT (document_annotations);
+        page = ev_annotation_get_page (annot);
+        poppler_page = POPPLER_PAGE (page->backend_page);
+
+	g_hash_table_remove (pdf_document->annots,
+			     GINT_TO_POINTER (page->index));
+
+	printf("\ndone0\n");
+	poppler_page_remove_annot (poppler_page, poppler_annot);
+
+	printf("\ndone1\n");
+	//g_free(G_OBJECT(annot));
+	//printf("\ndone2\n");
+	//g_object_unref (poppler_annot);
+	//g_object_unref (poppler_page);
+	
+	pdf_document->annots_modified = TRUE;
+}
 
 static void
 pdf_document_document_annotations_iface_init (EvDocumentAnnotationsInterface *iface)
@@ -3216,6 +3249,7 @@ pdf_document_document_annotations_iface_init (EvDocumentAnnotationsInterface *if
 	iface->document_is_modified = pdf_document_annotations_document_is_modified;
 	iface->add_annotation = pdf_document_annotations_add_annotation;
 	iface->save_annotation = pdf_document_annotations_save_annotation;
+	iface->remove_annotation = pdf_document_annotations_remove_annotation;
 }
 
 /* Attachments */

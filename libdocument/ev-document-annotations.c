@@ -66,6 +66,19 @@ ev_document_annotations_add_annotation (EvDocumentAnnotations *document_annots,
 		iface->add_annotation (document_annots, annot, rect);
 }
 
+void
+ev_document_annotations_remove_annotation (EvDocumentAnnotations *document_annots,
+		 			   EvAnnotation          *annot)
+{
+
+	 EvDocumentAnnotationsInterface *iface = EV_DOCUMENT_ANNOTATIONS_GET_IFACE (document_annots);
+
+	 printf("\nremoval in document\n");
+	 if (iface->remove_annotation)
+         	iface->remove_annotation (document_annots, annot);
+
+}
+
 gboolean
 ev_document_annotations_can_add_annotation (EvDocumentAnnotations *document_annots)
 {
@@ -73,3 +86,13 @@ ev_document_annotations_can_add_annotation (EvDocumentAnnotations *document_anno
 
 	return iface->add_annotation != NULL;
 }
+
+gboolean
+ev_document_annotations_can_remove_annotation (EvDocumentAnnotations *document_annots)
+{       
+	EvDocumentAnnotationsInterface *iface = EV_DOCUMENT_ANNOTATIONS_GET_IFACE (document_annots);
+		
+	return iface->remove_annotation != NULL;		   
+}
+
+
